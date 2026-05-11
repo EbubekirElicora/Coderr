@@ -34,10 +34,10 @@ class OrderViewSet(viewsets.ModelViewSet):
             return self.queryset.all()
 
         return self.queryset.filter(
-        customer_user=user
-    ) | self.queryset.filter(
-        business_user=userA
-    )
+            customer_user=user
+        ) | self.queryset.filter(
+            business_user=user
+     )
     
     def get_serializer_class(self):
         """Return serializer class based on the action."""
