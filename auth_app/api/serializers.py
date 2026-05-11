@@ -1,0 +1,78 @@
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from rest_framework import serializers
+
+from profile_app.models import UserProfile
+
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    """Serializer for user registration."""
+
+    repeated_password = serializers.CharField(write_only=True)
+    type = serializers.ChoiceField(
+        choices=UserProfile.USER_TYPE_CHOICES,
+        write_only=True,
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "password",
+            "repeated_password",
+            "type",
+        ]
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
+
+    def validate(self, attrs):
+        """Validate matching passwords and unique email."""
+        if attrs["password"] != attrs["repeated_password"]:
+            raise serializers.ValidationError(
+                {"repeated_password": "Passwords do not match."}
+            )
+
+        if User.objects.filter(email=attrs["email"]).exists():
+            raise serializers.ValidationError(
+                {"email": "A user with this email already exists."}
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        """Create user and related user profile."""
+        user_type = validated_data.pop("type")
+        validated_data.pop("repeated_password")
+
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
+        )
+        UserProfile.objects.create(user=user, type=user_type)
+
+        return user
+
+
+class LoginSerializer(serializers.Serializer):
+    """Serializer for user login."""
+
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        """Validate user credentials."""
+        user = authenticate(
+            username=attrs.get("username"),
+            password=attrs.get("password"),
+        )
+
+        if not user:
+            raise serializers.ValidationError(
+                {"detail": "Invalid username or password."}
+            )
+
+        attrs["user"] = user
+        return attrs
