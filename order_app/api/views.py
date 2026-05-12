@@ -24,6 +24,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    pagination_class = None
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_queryset(self):
