@@ -1,7 +1,8 @@
 from django.db.models import Min, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,10 +18,19 @@ from .serializers import (
 )
 
 
+class OfferPagination(PageNumberPagination):
+    """Pagination for offer list responses."""
+
+    page_size = 6
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class OfferViewSet(viewsets.ModelViewSet):
     """ViewSet for offer CRUD endpoints."""
 
     queryset = Offer.objects.all()
+    pagination_class = OfferPagination
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
@@ -32,15 +42,16 @@ class OfferViewSet(viewsets.ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
-        """Return filtered, searched and ordered offers."""
-        queryset = self.queryset.annotate(
-            min_price_value=Min("details__price"),
-            min_delivery_time_value=Min("details__delivery_time_in_days"),
+        """Return offers filtered, searched and ordered by query params."""
+        queryset = Offer.objects.annotate(
+            min_price_value=Min("details__price")
         )
+
         queryset = self.filter_queryset_by_params(queryset)
         queryset = self.search_queryset(queryset)
+        queryset = self.order_queryset(queryset)
 
-        return self.order_queryset(queryset)
+        return queryset.distinct()
 
     def get_serializer_class(self):
         """Return serializer class based on the action."""
@@ -96,22 +107,22 @@ class OfferViewSet(viewsets.ModelViewSet):
 
     def filter_queryset_by_params(self, queryset):
         """Apply offer query parameter filters."""
-        creator_id = self.request.query_params.get("creator_id")
-        min_price = self.request.query_params.get("min_price")
-        max_delivery_time = self.request.query_params.get("max_delivery_time")
+        creator_id = self.get_int_query_param("creator_id")
+        min_price = self.get_float_query_param("min_price")
+        max_delivery_time = self.get_int_query_param("max_delivery_time")
 
-        if creator_id:
+        if creator_id is not None:
             queryset = queryset.filter(user_id=creator_id)
 
-        if min_price:
+        if min_price is not None:
             queryset = queryset.filter(details__price__gte=min_price)
 
-        if max_delivery_time:
+        if max_delivery_time is not None:
             queryset = queryset.filter(
                 details__delivery_time_in_days__lte=max_delivery_time
             )
 
-        return queryset.distinct()
+        return queryset
 
     def search_queryset(self, queryset):
         """Apply title and description search."""
@@ -128,16 +139,52 @@ class OfferViewSet(viewsets.ModelViewSet):
         """Apply allowed ordering."""
         ordering = self.request.query_params.get("ordering")
 
+        if not ordering:
+            return queryset.order_by("-updated_at")
+
+        allowed_ordering = [
+            "updated_at",
+            "-updated_at",
+            "min_price",
+            "-min_price",
+        ]
+
+        if ordering not in allowed_ordering:
+            raise ValidationError(
+                {"ordering": "Invalid ordering parameter."}
+            )
+
         if ordering == "min_price":
             return queryset.order_by("min_price_value")
 
         if ordering == "-min_price":
             return queryset.order_by("-min_price_value")
 
-        if ordering in ["updated_at", "-updated_at"]:
-            return queryset.order_by(ordering)
+        return queryset.order_by(ordering)
 
-        return queryset.order_by("-updated_at")
+    def get_int_query_param(self, name):
+        """Return an integer query parameter or raise 400."""
+        value = self.request.query_params.get(name)
+
+        if value in [None, ""]:
+            return None
+
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            raise ValidationError({name: "A valid integer is required."})
+
+    def get_float_query_param(self, name):
+        """Return a float query parameter or raise 400."""
+        value = self.request.query_params.get(name)
+
+        if value in [None, ""]:
+            return None
+
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            raise ValidationError({name: "A valid number is required."})
 
 
 class OfferDetailView(APIView):

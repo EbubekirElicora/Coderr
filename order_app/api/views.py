@@ -1,14 +1,13 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from order_app.models import Order
+from profile_app.models import UserProfile
 
 from .permissions import (
     can_see_order,
-    is_business_user,
     is_customer_user,
     is_order_business,
 )
@@ -17,6 +16,17 @@ from .serializers import (
     OrderSerializer,
     OrderStatusUpdateSerializer,
 )
+
+
+def validate_business_user_exists(business_user_id):
+    """Raise 404 if the given business user does not exist."""
+    exists = UserProfile.objects.filter(
+        user_id=business_user_id,
+        type=UserProfile.BUSINESS,
+    ).exists()
+
+    if not exists:
+        raise NotFound("Business user not found.")
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -38,8 +48,8 @@ class OrderViewSet(viewsets.ModelViewSet):
             customer_user=user
         ) | self.queryset.filter(
             business_user=user
-     )
-    
+        )
+
     def get_serializer_class(self):
         """Return serializer class based on the action."""
         if self.action == "create":
@@ -106,7 +116,9 @@ class OrderCountView(APIView):
     """Return active order count for a business user."""
 
     def get(self, request, business_user_id):
-        """Return count of in progress orders."""
+        """Return active orders for the given business user."""
+        validate_business_user_exists(business_user_id)
+
         count = Order.objects.filter(
             business_user_id=business_user_id,
             status=Order.IN_PROGRESS,
@@ -119,7 +131,9 @@ class CompletedOrderCountView(APIView):
     """Return completed order count for a business user."""
 
     def get(self, request, business_user_id):
-        """Return count of completed orders."""
+        """Return completed orders for the given business user."""
+        validate_business_user_exists(business_user_id)
+
         count = Order.objects.filter(
             business_user_id=business_user_id,
             status=Order.COMPLETED,

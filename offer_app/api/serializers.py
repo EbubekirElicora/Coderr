@@ -145,24 +145,53 @@ class OfferWriteSerializer(serializers.ModelSerializer):
 
     def validate_details(self, value):
         """Validate offer detail types."""
-        offer_types = [detail["offer_type"] for detail in value]
-
+        valid_offer_types = ["basic", "standard", "premium"]
+        offer_types = []
+        for detail in value:
+            offer_type = detail.get("offer_type")
+            if not offer_type:
+                raise serializers.ValidationError(
+                    "Each detail must contain an offer_type."
+                )
+            if offer_type not in valid_offer_types:
+                raise serializers.ValidationError(
+                    f"Invalid offer_type '{offer_type}'."
+                )
+            offer_types.append(offer_type)
         if len(offer_types) != len(set(offer_types)):
             raise serializers.ValidationError("Offer types must be unique.")
-
         return value
 
     def validate(self, attrs):
         """Validate create and update data."""
+        self.validate_raw_input_types()
+
         if self.instance is None:
             self.validate_create_details(attrs)
 
         return attrs
 
+    def validate_raw_input_types(self):
+        """Validate raw input types before DRF converts values."""
+        title = self.initial_data.get("title")
+        description = self.initial_data.get("description")
+        details = self.initial_data.get("details")
+        if title is not None and not isinstance(title, str):
+            raise serializers.ValidationError(
+                {"title": "A valid string is required."}
+            )
+        if description is not None and not isinstance(description, str):
+            raise serializers.ValidationError(
+                {"description": "A valid string is required."}
+            )
+        if details is not None and not isinstance(details, list):
+            raise serializers.ValidationError(
+                {"details": "A valid list is required."}
+            )
+
     def validate_create_details(self, attrs):
         """Validate that new offers contain three details."""
         details = attrs.get("details", [])
-
         if len(details) != 3:
             raise serializers.ValidationError(
                 {"details": "An offer must contain exactly three details."}
@@ -172,10 +201,8 @@ class OfferWriteSerializer(serializers.ModelSerializer):
         """Create an offer with its details."""
         details_data = validated_data.pop("details")
         offer = Offer.objects.create(**validated_data)
-
         for detail_data in details_data:
             OfferDetail.objects.create(offer=offer, **detail_data)
-
         return offer
 
     def update(self, instance, validated_data):
@@ -183,28 +210,35 @@ class OfferWriteSerializer(serializers.ModelSerializer):
         details_data = validated_data.pop("details", [])
         self.update_offer(instance, validated_data)
         self.update_details(instance, details_data)
-
         return instance
 
     def update_offer(self, offer, validated_data):
         """Update basic offer fields."""
         for field, value in validated_data.items():
             setattr(offer, field, value)
-
         offer.save()
 
     def update_details(self, offer, details_data):
         """Update offer details by offer type."""
         for detail_data in details_data:
             offer_type = detail_data.get("offer_type")
-            detail = offer.details.get(offer_type=offer_type)
+            if not offer_type:
+                raise serializers.ValidationError(
+                    {"details": "offer_type is required."}
+                )
+            try:
+                detail = offer.details.get(offer_type=offer_type)
+            except OfferDetail.DoesNotExist:
+                raise serializers.ValidationError(
+                    {"details": f"Invalid offer_type '{offer_type}'."}
+                )
+
             self.update_detail(detail, detail_data)
 
     def update_detail(self, detail, detail_data):
         """Update one offer detail."""
         for field, value in detail_data.items():
             setattr(detail, field, value)
-
         detail.save()
 
     def to_representation(self, instance):
