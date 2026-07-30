@@ -944,13 +944,3 @@ The original frontend license information is retained in:
 ```text
 frontend/LICENSE.md
 ```
-
----
-
-## Author
-
-**Ebubekir Elicora**
-
-- Portfolio: https://ebubekir-elicora.de/
-- GitHub: https://github.com/EbubekirElicora
-- Coderr: https://coderr.ebubekir-elicora.de/
