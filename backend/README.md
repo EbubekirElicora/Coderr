@@ -1,26 +1,62 @@
 # Coderr Backend API
 
-This repository contains the Django REST Framework backend for the Coderr marketplace frontend.
+This directory contains the Django REST Framework backend of the Coderr full-stack marketplace application.
 
-All documented API endpoints are available below `/api/`.
+The complete project is maintained as a monorepo containing both the backend and frontend.
+
+All documented API endpoints are available below:
+
+```text
+/api/
+```
+
+---
 
 ## Live Deployment
 
-Frontend:
+### Application
 
-https://coderr.ebubekir-elicora.de
+https://coderr.ebubekir-elicora.de/
 
-Public API example:
+### Public API Example
 
 https://coderr.ebubekir-elicora.de/api/base-info/
 
-Frontend repository:
+### Django Administration
 
-https://github.com/EbubekirElicora/Coderr_FrontEnd
+https://coderr.ebubekir-elicora.de/admin/
 
-Backend repository:
+### Repository
 
 https://github.com/EbubekirElicora/Coderr
+
+### Frontend Source
+
+[`../frontend/`](../frontend/)
+
+---
+
+## Project Overview
+
+Coderr is a full-stack marketplace application where customers can discover and order digital services from business users.
+
+The backend provides:
+
+- User registration and login
+- Token-based authentication
+- Customer and business profiles
+- Offer and package management
+- Order management
+- Review management
+- Marketplace statistics
+- Role-based permissions
+- Image uploads
+- Search, filtering and ordering
+- Pagination
+- Django administration
+- Production deployment through Gunicorn and Nginx
+
+---
 
 ## Tech Stack
 
@@ -29,33 +65,130 @@ https://github.com/EbubekirElicora/Coderr
 - Python 3.12+
 - Django 6
 - Django REST Framework
-- DRF token authentication
+- DRF Token Authentication
 - Django Filter
 - Django CORS Headers
 - Pillow
 - SQLite
 
-### Production Deployment
+### Production Infrastructure
 
 - Google Cloud Compute Engine
 - Ubuntu Server
+- Nginx
 - Gunicorn
 - Supervisor
-- Nginx
-- Let's Encrypt
 - Certbot
+- Let's Encrypt
 - HTTPS
+
+### Development Tools
+
+- Git
+- GitHub
+- Visual Studio Code
+- Postman
+- Windows PowerShell
+- Linux shell
+- Django Admin
+
+---
+
+## Backend Structure
+
+```text
+backend/
+├── auth_app/
+│   ├── api/
+│   │   ├── serializers.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── migrations/
+│   ├── admin.py
+│   ├── apps.py
+│   └── models.py
+│
+├── core/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+│
+├── marketplace_app/
+│   ├── api/
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── migrations/
+│   ├── admin.py
+│   ├── apps.py
+│   └── models.py
+│
+├── offer_app/
+│   ├── api/
+│   │   ├── permissions.py
+│   │   ├── serializers.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── migrations/
+│   ├── admin.py
+│   ├── apps.py
+│   └── models.py
+│
+├── order_app/
+│   ├── api/
+│   │   ├── permissions.py
+│   │   ├── serializers.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── migrations/
+│   ├── admin.py
+│   ├── apps.py
+│   └── models.py
+│
+├── profile_app/
+│   ├── api/
+│   │   ├── permissions.py
+│   │   ├── serializers.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── migrations/
+│   ├── admin.py
+│   ├── apps.py
+│   └── models.py
+│
+├── review_app/
+│   ├── api/
+│   │   ├── permissions.py
+│   │   ├── serializers.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── migrations/
+│   ├── admin.py
+│   ├── apps.py
+│   └── models.py
+│
+├── manage.py
+├── requirements.txt
+└── README.md
+```
+
+---
 
 ## Local Setup
 
-Clone the repository:
+Clone the complete monorepo:
 
 ```bash
 git clone https://github.com/EbubekirElicora/Coderr.git
-cd Coderr
 ```
 
-Create a virtual environment:
+Open the backend directory:
+
+```bash
+cd Coderr/backend
+```
+
+### Create a Virtual Environment
 
 ```bash
 python -m venv env
@@ -73,25 +206,25 @@ Activate it on macOS or Linux:
 source env/bin/activate
 ```
 
-Install the dependencies:
+### Install Dependencies
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-Create or update the database:
+### Apply Database Migrations
 
 ```bash
 python manage.py migrate
 ```
 
-Create an admin user if required:
+### Create an Administrator Account
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Start the local development server:
+### Start the Development Server
 
 ```bash
 python manage.py runserver
@@ -103,59 +236,67 @@ The local API is then available at:
 http://127.0.0.1:8000/api/
 ```
 
-## Demo Login
+The local Django administration area is available at:
 
-The deployed frontend provides demo access for both supported user types.
+```text
+http://127.0.0.1:8000/admin/
+```
 
-### Demo customer
+---
+
+## Demo Accounts
+
+The deployed application provides demo access for both supported user types.
+
+### Demo Customer
 
 ```text
 Username: Demo-Kunde
 Password: DemoPassword123!
 ```
 
-### Demo business user
+The demo customer can:
+
+- Browse offers
+- Create orders
+- View their own orders
+- Create reviews
+- Edit or delete their own reviews
+
+### Demo Business User
 
 ```text
 Username: Demo-Anbieter
 Password: DemoPassword123!
 ```
 
-The demo customer can create orders and reviews.
+The demo business user can:
 
-The demo business user can create offers and update the statuses of orders related to their offers.
+- Create offers
+- Edit their own offers
+- Delete their own offers
+- View related orders
+- Update related order statuses
 
-Both demo users are normal non-staff accounts. Only staff or superuser accounts can access the Django administration area.
+Both demo users are normal non-staff users.
 
-## Django Admin
+Only staff or superuser accounts can access Django Admin.
 
-The local administration area is available at:
-
-```text
-http://127.0.0.1:8000/admin/
-```
-
-In production it is available below:
-
-```text
-https://coderr.ebubekir-elicora.de/admin/
-```
-
-Only staff or superuser accounts can access the Django admin.
+---
 
 ## Authentication
 
-All protected endpoints use Django REST Framework token authentication.
+The backend uses Django REST Framework token authentication.
 
-Header format:
+Login and registration do not require authentication.
+
+Protected endpoints require the following header:
 
 ```text
 Authorization: Token <token>
 ```
 
-Login and registration do not require authentication.
-
-A successful login or registration returns a token and basic user information.
+A successful login or registration returns an authentication token and basic user information.
 
 Example:
 
@@ -168,6 +309,10 @@ Example:
 }
 ```
 
+The frontend stores the token in the browser and includes it in protected API requests.
+
+---
+
 ## User Types
 
 The application supports two profile types:
@@ -177,81 +322,145 @@ customer
 business
 ```
 
+### Customer Users
+
 Customer users can:
 
+- Browse offers
+- View offer details
 - Create orders
 - View their own orders
 - Create reviews
-- Edit or delete their own reviews
+- Edit their own reviews
+- Delete their own reviews
+- Edit their own profile
+
+### Business Users
 
 Business users can:
 
 - Create offers
-- Edit or delete their own offers
+- Edit their own offers
+- Delete their own offers
 - View orders related to their offers
-- Update the status of related orders
+- Update related order statuses
+- Edit their own profile
 
-## Endpoints
+---
+
+## API Endpoints
 
 ### Authentication
 
 | Method | Endpoint | Description |
-| --- | --- | --- |
-| POST | `/api/registration/` | Create a new user profile and return a token |
+| :---: | :--- | :--- |
+| POST | `/api/registration/` | Register a new user and return a token |
 | POST | `/api/login/` | Authenticate a user and return a token |
+
+---
 
 ### Profiles
 
 | Method | Endpoint | Description |
-| --- | --- | --- |
+| :---: | :--- | :--- |
 | GET | `/api/profile/<user_id>/` | Retrieve one user profile |
 | PATCH | `/api/profile/<user_id>/` | Update the authenticated user's own profile |
-| GET | `/api/profiles/business/` | List all business profiles |
-| GET | `/api/profiles/customer/` | List all customer profiles |
+| GET | `/api/profiles/business/` | List business profiles |
+| GET | `/api/profiles/customer/` | List customer profiles |
+
+---
 
 ### Offers
 
 | Method | Endpoint | Description |
-| --- | --- | --- |
-| GET | `/api/offers/` | List offers with pagination, filters, search and ordering |
+| :---: | :--- | :--- |
+| GET | `/api/offers/` | List offers with pagination, search, filters and ordering |
 | POST | `/api/offers/` | Create an offer as a business user |
 | GET | `/api/offers/<offer_id>/` | Retrieve one offer |
 | PATCH | `/api/offers/<offer_id>/` | Update an offer as its owner |
 | DELETE | `/api/offers/<offer_id>/` | Delete an offer as its owner |
 | GET | `/api/offerdetails/<offerdetail_id>/` | Retrieve one offer detail |
 
+Each offer contains three service packages:
+
+```text
+basic
+standard
+premium
+```
+
+Each package can contain:
+
+- Title
+- Description
+- Price
+- Delivery time
+- Number of revisions
+- Individual features
+
+---
+
 ### Orders
 
 | Method | Endpoint | Description |
-| --- | --- | --- |
+| :---: | :--- | :--- |
 | GET | `/api/orders/` | List orders related to the authenticated user |
-| POST | `/api/orders/` | Create an order as a customer from an offer detail |
+| POST | `/api/orders/` | Create an order as a customer |
 | GET | `/api/orders/<order_id>/` | Retrieve one order |
 | PATCH | `/api/orders/<order_id>/` | Update an order status as the related business user |
-| DELETE | `/api/orders/<order_id>/` | Delete an order as an admin user |
-| GET | `/api/order-count/<business_user_id>/` | Return the active order count for a business user |
-| GET | `/api/completed-order-count/<business_user_id>/` | Return the completed order count for a business user |
+| DELETE | `/api/orders/<order_id>/` | Delete an order as an administrator |
+| GET | `/api/order-count/<business_user_id>/` | Return the active-order count |
+| GET | `/api/completed-order-count/<business_user_id>/` | Return the completed-order count |
+
+Orders are created using an offer-detail ID:
+
+```json
+{
+  "offer_detail_id": 1
+}
+```
+
+---
 
 ### Reviews
 
 | Method | Endpoint | Description |
-| --- | --- | --- |
+| :---: | :--- | :--- |
 | GET | `/api/reviews/` | List reviews with filters and ordering |
 | POST | `/api/reviews/` | Create a review as a customer |
 | PATCH | `/api/reviews/<review_id>/` | Update a review as its owner |
 | DELETE | `/api/reviews/<review_id>/` | Delete a review as its owner |
 
-### Base Info
+A customer can only create one review for the same business user.
+
+---
+
+### Marketplace Statistics
 
 | Method | Endpoint | Description |
-| --- | --- | --- |
+| :---: | :--- | :--- |
 | GET | `/api/base-info/` | Return general marketplace statistics |
+
+Example response:
+
+```json
+{
+  "review_count": 2,
+  "average_rating": 4.0,
+  "business_profile_count": 1,
+  "offer_count": 5
+}
+```
+
+The exact values depend on the current production database.
+
+---
 
 ## Query Parameters
 
 ### Offers
 
-The offer list endpoint supports:
+The offer-list endpoint supports:
 
 ```text
 creator_id
@@ -285,9 +494,11 @@ updated_at
 -updated_at
 ```
 
+---
+
 ### Reviews
 
-The review list endpoint supports:
+The review-list endpoint supports:
 
 ```text
 business_user_id
@@ -315,11 +526,13 @@ updated_at
 -updated_at
 ```
 
+---
+
 ## Response Formats
 
-### Paginated offer response
+### Paginated Offer Response
 
-`GET /api/offers/` returns:
+`GET /api/offers/` returns a paginated response:
 
 ```json
 {
@@ -330,7 +543,7 @@ updated_at
 }
 ```
 
-### Order response
+### Order Response
 
 `GET /api/orders/` returns a direct list:
 
@@ -338,7 +551,7 @@ updated_at
 []
 ```
 
-### Review response
+### Review Response
 
 `GET /api/reviews/` returns a direct list:
 
@@ -346,11 +559,7 @@ updated_at
 []
 ```
 
-### Base-info response
-
-The values depend on the current database content.
-
-Example:
+### Base-Info Response
 
 ```json
 {
@@ -361,43 +570,83 @@ Example:
 }
 ```
 
+---
+
 ## Permission Rules
 
-- Login, registration, the offer list and base info are publicly accessible.
-- All other protected endpoints require token authentication.
-- Users can retrieve profile information after authentication.
-- Users can only update their own profile.
+### General
+
+- Login and registration are publicly accessible.
+- The offer list is publicly accessible.
+- Marketplace statistics are publicly accessible.
+- Protected endpoints require token authentication.
+- Staff and superusers can access Django Admin.
+
+### Profiles
+
+- Authenticated users can retrieve profile information.
+- Users can only update their own profiles.
+
+### Offers
+
 - Business users can create offers.
 - Customer users cannot create offers.
-- An offer must contain exactly three offer details.
-- Offer detail types within one offer must be unique.
-- Only the offer owner can update or delete an offer.
+- Each offer must contain exactly three offer details.
+- Offer-detail types must be unique within an offer.
+- Only the offer owner can update an offer.
+- Only the offer owner can delete an offer.
 - Authenticated users can retrieve individual offer details.
+
+### Orders
+
 - Customer users can create orders.
 - Business users cannot create orders.
 - Orders are created using an `offer_detail_id`.
 - Customers can view their own orders.
 - Business users can view orders related to their offers.
 - Only the related business user can update an order status.
-- Only staff or admin users can delete orders.
+- Only staff or administrator users can delete orders.
+
+### Reviews
+
 - Customer users can create reviews.
 - Business users cannot create reviews.
-- A customer can only create one review per business user.
-- Only the review creator can update or delete a review.
+- A customer can only review the same business user once.
+- Only the review creator can update a review.
+- Only the review creator can delete a review.
+
+---
+
+## Django Admin
+
+The local administration area is available at:
+
+```text
+http://127.0.0.1:8000/admin/
+```
+
+The production administration area is available at:
+
+```text
+https://coderr.ebubekir-elicora.de/admin/
+```
+
+Only staff or superuser accounts can access Django Admin.
+
+---
 
 ## Production Architecture
 
-The deployed application uses the following structure:
-
 ```text
 Browser
-   ↓
+   │
+   ▼
 Nginx
-   ├── /          → Coderr frontend
-   ├── /api/      → Gunicorn and Django REST Framework
+   ├── /          → Static Coderr frontend
+   ├── /api/      → Gunicorn → Django REST Framework
    ├── /admin/    → Django administration
-   ├── /static/   → collected Django static files
-   └── /media/    → uploaded media files
+   ├── /static/   → Collected Django static files
+   └── /media/    → Uploaded media files
 ```
 
 The backend runs internally through Gunicorn on:
@@ -406,9 +655,41 @@ The backend runs internally through Gunicorn on:
 127.0.0.1:8002
 ```
 
-Port `8002` is not exposed directly to the internet. All public requests are handled by Nginx over HTTPS.
+Port `8002` is not exposed directly to the internet.
 
-Supervisor keeps the Gunicorn process running and automatically restarts it when required.
+Nginx handles all public requests over HTTPS.
+
+Supervisor keeps the Gunicorn process running and restarts it when required.
+
+---
+
+## Production Paths
+
+The complete monorepo is deployed at:
+
+```text
+/var/www/projects/coderr
+```
+
+Backend:
+
+```text
+/var/www/projects/coderr/backend
+```
+
+Frontend:
+
+```text
+/var/www/projects/coderr/frontend
+```
+
+Gunicorn logs:
+
+```text
+/var/www/projects/coderr/logs
+```
+
+---
 
 ## Production Environment Variables
 
@@ -422,7 +703,7 @@ DJANGO_DEBUG
 DJANGO_ALLOWED_HOSTS
 ```
 
-Example structure:
+Example:
 
 ```text
 DJANGO_DEBUG=False
@@ -431,27 +712,36 @@ DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost,coderr.ebubekir-elicora.de
 
 The real production secret key must never be committed to GitHub.
 
-## Updating the Production Backend
+---
 
-Connect to the server and open the backend directory:
+## Updating the Production Deployment
 
-```bash
-cd /var/www/projects/coderr/backend
-```
-
-Create a database backup before important changes:
+Connect to the server and open the monorepo directory:
 
 ```bash
-cp db.sqlite3 "db.sqlite3.backup-$(date +%Y%m%d-%H%M%S)"
+cd /var/www/projects/coderr
 ```
 
-Pull the current repository version:
+Create a database backup before important backend changes:
+
+```bash
+cp backend/db.sqlite3 \
+"backend/db.sqlite3.backup-$(date +%Y%m%d-%H%M%S)"
+```
+
+Pull the latest monorepo version:
 
 ```bash
 git pull
 ```
 
-Activate the virtual environment:
+Open the backend directory:
+
+```bash
+cd backend
+```
+
+Activate the production virtual environment:
 
 ```bash
 source venv/bin/activate
@@ -487,7 +777,7 @@ Restart the production service:
 sudo supervisorctl restart coderr
 ```
 
-Check its status:
+Check the service status:
 
 ```bash
 sudo supervisorctl status coderr
@@ -505,111 +795,121 @@ Test the public API:
 curl https://coderr.ebubekir-elicora.de/api/base-info/
 ```
 
+---
+
 ## Development Checks
 
-Run the Django system check:
+Run these commands from the `backend` directory.
+
+### Django System Check
 
 ```bash
 python manage.py check
 ```
 
-Check whether model changes require migrations:
+### Check for Missing Migrations
 
 ```bash
 python manage.py makemigrations --check --dry-run
 ```
 
-Create migrations when required:
+### Create Migrations
 
 ```bash
 python manage.py makemigrations
 ```
 
-Apply migrations:
+### Apply Migrations
 
 ```bash
 python manage.py migrate
 ```
 
-Check installed dependencies:
+### Check Dependencies
 
 ```bash
 python -m pip check
 ```
 
-Update `requirements.txt` on Windows without creating a UTF-16 file:
+### Update Requirements on Windows
 
 ```powershell
 cmd /c "python -m pip freeze > requirements.txt"
 ```
 
-On Linux or macOS:
+### Update Requirements on Linux or macOS
 
 ```bash
 python -m pip freeze > requirements.txt
 ```
 
-## Project Structure
+---
+
+## Security Notes
+
+Sensitive and generated files must not be committed.
+
+The repository excludes files such as:
 
 ```text
-Coderr/
-├── auth_app/
-│   └── api/
-│       ├── serializers.py
-│       ├── views.py
-│       └── urls.py
-├── core/
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-├── marketplace_app/
-│   └── api/
-│       ├── views.py
-│       └── urls.py
-├── offer_app/
-│   ├── models.py
-│   └── api/
-│       ├── permissions.py
-│       ├── serializers.py
-│       ├── views.py
-│       └── urls.py
-├── order_app/
-│   ├── models.py
-│   └── api/
-│       ├── permissions.py
-│       ├── serializers.py
-│       ├── views.py
-│       └── urls.py
-├── profile_app/
-│   ├── models.py
-│   └── api/
-│       ├── permissions.py
-│       ├── serializers.py
-│       ├── views.py
-│       └── urls.py
-├── review_app/
-│   ├── models.py
-│   └── api/
-│       ├── permissions.py
-│       ├── serializers.py
-│       ├── views.py
-│       └── urls.py
-├── manage.py
-├── requirements.txt
-└── README.md
+db.sqlite3
+*.sqlite3
+.env
+.env.*
+env/
+venv/
+.venv/
+media/
+staticfiles/
+__pycache__/
+*.log
 ```
 
-## Important Rules
+Additional security measures include:
 
-- Do not commit `db.sqlite3`.
-- Do not commit real production secrets.
-- Do not commit `env/`, `venv/` or `.venv/`.
-- Do not commit `staticfiles/`.
-- Do not commit local media files.
-- Do not commit `__pycache__/` directories.
-- Keep the backend and frontend in separate repositories.
-- Keep `requirements.txt` up to date.
-- Run `python manage.py check` before pushing changes.
-- Remove debugging `print()` statements before submission.
-- Do not commit the frontend into this backend repository.
+- Django password hashing
+- Token authentication
+- Server-side permission checks
+- Role-based restrictions
+- HTTPS encryption
+- Production secrets outside Git
+- Internal Gunicorn port
+- Nginx reverse proxy
+- Restricted Django Admin access
+
+---
+
+## Testing Checklist
+
+Before pushing backend changes:
+
+- Run `python manage.py check`
+- Check for missing migrations
+- Test registration
+- Test login
+- Test customer permissions
+- Test business permissions
+- Test profiles
+- Test offer creation
+- Test offer editing
+- Test offer deletion
+- Test offer filters
+- Test offer search
+- Test order creation
+- Test order status updates
+- Test reviews
+- Test API error responses
+- Test the public API after deployment
+- Do not commit credentials or private data
+
+---
+
+## Related Documentation
+
+### Main Project Documentation
+
+[`../README.md`](../README.md)
+
+### Frontend Documentation
+
+[`../frontend/README.md`](../frontend/README.md)
